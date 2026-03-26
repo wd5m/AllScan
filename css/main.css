@@ -303,6 +303,10 @@ background-color:hsl(120,50%,33%);
 .ib { display:inline-block; }
 .m5 { margin:5px; }
 .nodeNum { cursor:pointer; }
+.nodeClick { cursor:pointer; background-color:#444;}
+.nodeClick:hover { cursor:pointer; background-color:#777;}
+.nodeClickY { cursor:pointer; background-color:lightyellow; color:black;}
+.nodeClickY:hover { cursor:pointer; background-color:yellow; color:black;}
 .w600 { max-width:600px; }
 
 .button1 {
