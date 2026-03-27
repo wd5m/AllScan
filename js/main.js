@@ -400,9 +400,9 @@ function handleNodesEvent(event) {
 						}
 					} else {
 						if(rowdata.mute == 1) {
-							tablehtml += '<td value="unmute" id="unmute" class="nodeClickY">Muted</td>';
+							tablehtml += '<td value="unmute" id="unmute">Muted</td>';
 						} else if(rowdata.mute==0) {
-							tablehtml += '<td value="mute" id="mute" class="nodeClick">Mute</td>';
+							tablehtml += '<td value="mute" id="mute">Mute</td>';
 						}
 					}
 					var id = 't' + n + 'c8' + 'r' + row;
@@ -414,9 +414,9 @@ function handleNodesEvent(event) {
 						}
 					} else {
 						if(rowdata.monitor == 1) {
-							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClickY">Monitoring</td>';
+							tablehtml += '<td value="unmonitor" id="unmonitor">Monitoring</td>';
 						} else if(rowdata.monitor==0) {
-							tablehtml += '<td value="monitor" id="monitor" class="nodeClick">Monitor</td>';
+							tablehtml += '<td value="monitor" id="monitor">Monitor</td>';
 						}
 					}
 
