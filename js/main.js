@@ -305,7 +305,7 @@ function handleConnectionEvent(event) {
 	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="6">' + data.status + '</td></tr>');
 	const cstbl = document.getElementById(tableID);
 	var tbody0 = cstbl.getElementsByTagName('tbody')[0];
-	tbody0.innerHTML = '<tr><td colspan="6">' + data.status + '</td></tr>';
+	tbody0.innerHTML = '<tr><td colspan="8">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
 	// Clear rldTmr if set
@@ -327,25 +327,25 @@ function handleNodesEvent(event) {
 		}
 		if(cos_keyed == 0) {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="7"></td></tr>';
 			} else {
-				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F534} '; // Red Circle
 			}
 		} else {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F7E2} '; // Green Circle
 			} else {
 				tablehtml += '<tr class="bColor"><td>' + n +
-					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
+					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F7E1} '; // Orange Circle
 			}
 		}
 		for(row in tabledata[n].remote_nodes) {
 			var rowdata = tabledata[n].remote_nodes[row];
 			if(rowdata.info === 'NO CONNECTION') {
-				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
+				tablehtml += '<tr><td colspan="9">No Connections</td></tr>';
 				if(lnodes.length) {
 					lnodes = [];
 					updateFavsTableNodeCol();
@@ -390,13 +390,43 @@ function handleNodesEvent(event) {
 					} else {
 						tablehtml += '<td>' + rowdata.mode + '</td>';
 					}
+
+					var id = 't' + n + 'c7' + 'r' + row;
+					if(rowdata.modifyok == 1) {
+						if(rowdata.mute == 1) {
+							tablehtml += '<td value="unmute" id="unmute" class="nodeClickY" onClick="muteNode(\'unmute\',' + nodeNum + ')" title="Click to unmute node ' + nodeNum + '">Unmute</td>';
+						} else if(rowdata.mute==0) {
+							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="muteNode(\'mute\',' + nodeNum + ')" title="Click to mute node ' + nodeNum + '">Mute</td>';
+						}
+					} else {
+						if(rowdata.mute == 1) {
+							tablehtml += '<td value="unmute" id="unmute">Muted</td>';
+						} else if(rowdata.mute==0) {
+							tablehtml += '<td value="mute" id="mute">Mute</td>';
+						}
+					}
+					var id = 't' + n + 'c8' + 'r' + row;
+					if(rowdata.modifyok == 1) {
+						if(rowdata.monitor == 1) {
+							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClickY" onClick="muteNode(\'unmonitor\',' + nodeNum + ')" title="Click to unmonitor node ' + nodeNum + '">Unmonitor</td>';
+						} else if(rowdata.monitor==0) {
+							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="muteNode(\'monitor\',' + nodeNum + ')" title="Click to monitor node ' + nodeNum + '">Monitor</td>';
+						}
+					} else {
+						if(rowdata.monitor == 1) {
+							tablehtml += '<td value="unmonitor" id="unmonitor">Monitoring</td>';
+						} else if(rowdata.monitor==0) {
+							tablehtml += '<td value="monitor" id="monitor">Monitor</td>';
+						}
+					}
+
 					tablehtml += '</tr>';
 				}
 			}
 		}
 		// Display Count
 		if(total_nodes > 1) {
-			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected</td></tr>';
+			tablehtml += '<tr><td colspan="8">' + total_nodes + ' nodes connected</td></tr>';
 		}
 		// $('#table_' + n + ' tbody:first').html(tablehtml);
 		const cstbl = document.getElementById('table_' + n);
@@ -483,6 +513,14 @@ function handleApiResponse() {
 	}
 }
 
+function muteNode(button,remoteNode) {
+	if(remoteNode < 1) {
+		alert('Please enter a valid remote node number.');
+		return;
+	}
+	parms = 'remotenode='+remoteNode + '&button='+button + '&localnode='+localNode;
+	xhttpSend(astApiDir + 'mute.php', parms);
+}
 function connectNode(button) {
 	var remoteNode = rnode.value;
 	if(remoteNode < 1) {

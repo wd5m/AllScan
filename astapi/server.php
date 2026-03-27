@@ -8,6 +8,7 @@ date_default_timezone_set('America/New_York');
 require_once('../include/apiInit.php');
 require_once('AMI.php');
 require_once('nodeInfo.php');
+require_once('muteInfo.php');	// WD5M - functions for mute/monitor
 
 if(!readOk()) {
 	statErr('Insufficient user permission to retrieve data.');
@@ -75,6 +76,11 @@ if(_count($msg))
 	$s .= BR . implode(BR, $msg);
 statMsg($s);
 
+// WD5M vvv Is res_mutestream loaded so we use muteaudio?
+$mutesupport = checkModuleSupport($fp[$node],'res_mutestream');
+//statMsg('res_mutestream module ' . ($mutesupport ? 'is' : 'is not') . ' available');
+// WD5M ^^^
+
 // Main loop - build $data array and output as a json object
 $current = [];
 $saved = [];
@@ -111,6 +117,17 @@ while(!empty($fp[$node])) {
 		$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
+		// WD5M vvv Added for mute/monitor support
+		if($mutesupport) {
+			if(modifyOk()) {
+				$current[$node]['remote_nodes'][$i]['modifyok'] = '1';
+			} else {
+				$current[$node]['remote_nodes'][$i]['modifyok'] = '0';
+			}
+			$current[$node]['remote_nodes'][$i]['mute'] = checkMuteaudioStatus($fp[$node],'mute',$node,$arr['node']) ?? '0';
+			$current[$node]['remote_nodes'][$i]['monitor'] = checkMuteaudioStatus($fp[$node],'monitor',$node,$arr['node']) ?? '0';
+		}
+		// WD5M ^^^
 		$i++;
 	}
 	// Send current nodes only when data changes
