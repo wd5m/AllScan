@@ -394,9 +394,9 @@ function handleNodesEvent(event) {
 					var id = 't' + n + 'c7' + 'r' + row;
 					if(rowdata.modifyok == 1) {
 						if(rowdata.mute == 1) {
-							tablehtml += '<td value="unmute" id="unmute" class="nodeClickY" onClick="setNodeBox(' + nodeNum + ');muteNode(\'unmute\',\'' + rowdata.direction + '\')" title="Click to unmute node ' + nodeNum + '">Unmute</td>';
+							tablehtml += '<td value="unmute" id="unmute" class="nodeClickY" onClick="muteNode(\'unmute\',' + nodeNum + ')" title="Click to unmute node ' + nodeNum + '">Unmute</td>';
 						} else if(rowdata.mute==0) {
-							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="setNodeBox(' + nodeNum + ');muteNode(\'mute\',\'' + rowdata.direction + '\')" title="Click to mute node ' + nodeNum + '">Mute</td>';
+							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="muteNode(\'mute\',' + nodeNum + ')" title="Click to mute node ' + nodeNum + '">Mute</td>';
 						}
 					} else {
 						if(rowdata.mute == 1) {
@@ -408,9 +408,9 @@ function handleNodesEvent(event) {
 					var id = 't' + n + 'c8' + 'r' + row;
 					if(rowdata.modifyok == 1) {
 						if(rowdata.monitor == 1) {
-							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClickY" onClick="setNodeBox(' + nodeNum + ');muteNode(\'unmonitor\')" title="Click to unmonitor node ' + nodeNum + '">Unmonitor</td>';
+							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClickY" onClick="muteNode(\'unmonitor\',' + nodeNum + ')" title="Click to unmonitor node ' + nodeNum + '">Unmonitor</td>';
 						} else if(rowdata.monitor==0) {
-							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="setNodeBox(' + nodeNum + ');muteNode(\'monitor\')" title="Click to monitor node ' + nodeNum + '">Monitor</td>';
+							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="muteNode(\'monitor\',' + nodeNum + ')" title="Click to monitor node ' + nodeNum + '">Monitor</td>';
 						}
 					} else {
 						if(rowdata.monitor == 1) {
@@ -513,8 +513,7 @@ function handleApiResponse() {
 	}
 }
 
-function muteNode(button,direction) {
-	var remoteNode = rnode.value;
+function muteNode(button,remoteNode) {
 	if(remoteNode < 1) {
 		alert('Please enter a valid remote node number.');
 		return;
