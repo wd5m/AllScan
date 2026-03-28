@@ -7,7 +7,9 @@ function getAstInfo($fp, $nodeNum) {
 		$dbNode = $astdb[$nodeNum];
 		$info = $dbNode[1] . ' ' . $dbNode[2] . ' ' . $dbNode[3];
 		// Link to ASL stats page
-		$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
+		if($nodeNum >= 2000 && $nodeNum < 3000000) {
+			$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
+		}
 	} elseif($nodeNum > 3000000) {
 		$info = getEchoLinkInfo($fp, $nodeNum);
 	} elseif(!empty($node['ip'])) {
