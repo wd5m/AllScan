@@ -368,7 +368,7 @@ function handleNodesEvent(event) {
 						tablehtml += '<tr>';
 					}
 					var id = 't' + n + 'c0' + 'r' + row;
-					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum + ')" onDblClick="disconnectNode();">' +
+					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum + ')" onDblClick="disconnectNode();" title="Click to set node box, doubleclick to disconnect node ' + nodeNum + '">' +
 						nodeNum + '</td>';
 					// Show info or IP
 					if(rowdata.info != "") {
@@ -394,29 +394,29 @@ function handleNodesEvent(event) {
 					var id = 't' + n + 'c7' + 'r' + row;
 					if(rowdata.modifyok == 1) {
 						if(rowdata.mute == 1) {
-							tablehtml += '<td value="unmute" id="unmute" class="nodeClickY" onClick="muteNode(\'unmute\',' + nodeNum + ')" title="Click to unmute node ' + nodeNum + '">Unmute</td>';
+							tablehtml += '<td value="unmute" id="unmute" class="nodeClick" onClick="muteNode(\'unmute\',' + nodeNum + ')" title="Click to unmute node ' + nodeNum + '"><img src="images/mic-mute-16x16.png" alt="Unmute" /></td>';
 						} else if(rowdata.mute==0) {
-							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="muteNode(\'mute\',' + nodeNum + ')" title="Click to mute node ' + nodeNum + '">Mute</td>';
+							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="muteNode(\'mute\',' + nodeNum + ')" title="Click to mute node ' + nodeNum + '"><img src="images/mic-16x16.png" alt="Mute" /></td>';
 						}
 					} else {
 						if(rowdata.mute == 1) {
-							tablehtml += '<td value="unmute" id="unmute">Muted</td>';
+							tablehtml += '<td value="unmute" id="unmute"><img src="images/mic-mute-16x16.png" alt="Muted" /></td>';
 						} else if(rowdata.mute==0) {
-							tablehtml += '<td value="mute" id="mute">Mute</td>';
+							tablehtml += '<td value="mute" id="mute"><img src="images/mic-16x16.png" alt="Mute" /></td>';
 						}
 					}
 					var id = 't' + n + 'c8' + 'r' + row;
 					if(rowdata.modifyok == 1) {
 						if(rowdata.monitor == 1) {
-							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClickY" onClick="muteNode(\'unmonitor\',' + nodeNum + ')" title="Click to unmonitor node ' + nodeNum + '">Unmonitor</td>';
+							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClick" onClick="muteNode(\'unmonitor\',' + nodeNum + ')" title="Click to unmonitor node ' + nodeNum + '"><img src="images/speaker-mute-16x16.png" alt="Unmonitor" /></td>';
 						} else if(rowdata.monitor==0) {
-							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="muteNode(\'monitor\',' + nodeNum + ')" title="Click to monitor node ' + nodeNum + '">Monitor</td>';
+							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="muteNode(\'monitor\',' + nodeNum + ')" title="Click to monitor node ' + nodeNum + '"><img src="images/speaker-16x16.png" alt="Monitor" /></td>';
 						}
 					} else {
 						if(rowdata.monitor == 1) {
-							tablehtml += '<td value="unmonitor" id="unmonitor">Monitoring</td>';
+							tablehtml += '<td value="unmonitor" id="unmonitor"><img src="images/speaker-mute-16x16.png" alt="Monitoring" /></td>';
 						} else if(rowdata.monitor==0) {
-							tablehtml += '<td value="monitor" id="monitor">Monitor</td>';
+							tablehtml += '<td value="monitor" id="monitor"><img src="images/speaker-16x16.png" alt="Monitor" /></td>';
 						}
 					}
 
