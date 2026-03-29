@@ -214,6 +214,9 @@ border-bottom-left-radius:10px;
 table tr:last-child td:last-child {
 border-bottom-right-radius:10px;
 }
+table tbody tr:hover {
+background-color:rgba(51,51,119,0.67);
+}
 
 table.noborder, table.noborder tr th, table.noborder tr td {
 border:0;
@@ -303,10 +306,18 @@ background-color:hsl(120,50%,33%);
 .ib { display:inline-block; }
 .m5 { margin:5px; }
 .nodeNum { cursor:pointer; }
-.nodeClick { cursor:pointer; background-color:#444;}
-.nodeClick:hover { cursor:pointer; background-color:#777;}
-.nodeClickY { cursor:pointer; background-color:lightyellow; color:black;}
-.nodeClickY:hover { cursor:pointer; background-color:yellow; color:black;}
+table.grid img {
+	vertical-align:middle;
+	width:16px;
+	height:auto;
+}
+.nodeClick {
+	cursor:pointer;
+	background-color:#444;
+}
+.nodeClick:hover {
+	background-color:#777;
+}
 .w600 { max-width:600px; }
 
 .button1 {
