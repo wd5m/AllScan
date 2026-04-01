@@ -10,7 +10,7 @@ function getAstInfo($fp, $nodeNum) {
 		if($nodeNum >= 2000 && $nodeNum < 3000000) {
 			$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
 		}
-	} elseif($nodeNum > 3000000) {
+	} elseif($nodeNum > 3000000 && $nodeNum < 4000000) {
 		$info = getEchoLinkInfo($fp, $nodeNum);
 	} elseif(!empty($node['ip'])) {
 		if(strlen(trim($node['ip'])) > 3) {
