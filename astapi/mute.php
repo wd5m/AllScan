@@ -111,21 +111,35 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 				// outgoing connections
 				if ($connectedLine === $thisNode && $extension === $targetNode) {
 					if ($channelType === 'echolink' || $channelType === 'tlb') {
-						// Allstar is swapping the audio in / out direction for tlb and EchoLink connections.
-						$res = $ami->setMuteAudio($fp, $channelName, ($direction === "in" ? 'out' : 'in'), $state);
-					} else {
-						$res = $ami->setMuteAudio($fp, $channelName, $direction, $state);
-					}
-					if ($res) {
-						if ($state) {
-							$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
-							$resp = $ami->command($fp, $dbCmd);
-						} else {
-							$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
-							$resp = $ami->command($fp, $dbCmd);
+						// Allstar has an issue with Asterisk MuteAudio on tlb and EchoLink connections.
+						// Until resolved, this will set MuteAudio to 'all' so both directions are muted, and set both DB status indicators.
+						if ($ami->setMuteAudio($fp, $channelName, 'all', $state)) {
+							if ($state) {
+								$dbCmd = 'database put ' . 'mute/' . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$resp = $ami->command($fp, $dbCmd);
+								$dbCmd = 'database put ' . 'monitor/' . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$resp = $ami->command($fp, $dbCmd);
+							} else {
+								$dbCmd = 'database del ' . 'mute/' . $thisNode . ' ' . $targetNode;
+								$resp = $ami->command($fp, $dbCmd);
+								$dbCmd = 'database del ' . 'monitor/' . $thisNode . ' ' . $targetNode;
+								$resp = $ami->command($fp, $dbCmd);
+							}
+							echo "MUTEAUDIO $thisNode $targetNode $channelName all $state succeeded!";
+							return(TRUE);
 						}
-						echo "MUTEAUDIO $thisNode $targetNode $channelName $direction $state succeeded!";
-						return(TRUE);
+					} else {
+						if ($ami->setMuteAudio($fp, $channelName, $direction, $state)) {
+							if ($state) {
+								$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$resp = $ami->command($fp, $dbCmd);
+							} else {
+								$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
+								$resp = $ami->command($fp, $dbCmd);
+							}
+							echo "MUTEAUDIO $thisNode $targetNode $channelName $direction $state succeeded!";
+							return(TRUE);
+						}
 					}
 				}
 			} else {
