@@ -305,7 +305,7 @@ function handleConnectionEvent(event) {
 	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="6">' + data.status + '</td></tr>');
 	const cstbl = document.getElementById(tableID);
 	var tbody0 = cstbl.getElementsByTagName('tbody')[0];
-	tbody0.innerHTML = '<tr><td colspan="6">' + data.status + '</td></tr>';
+	tbody0.innerHTML = '<tr><td colspan="8">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
 	// Clear rldTmr if set
@@ -327,25 +327,25 @@ function handleNodesEvent(event) {
 		}
 		if(cos_keyed == 0) {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="7"></td></tr>';
 			} else {
-				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F534} '; // Red Circle
 			}
 		} else {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F7E2} '; // Green Circle
 			} else {
 				tablehtml += '<tr class="bColor"><td>' + n +
-					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
+					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="7"></td></tr>';
 				pgTitlePrefix = '\u{1F7E1} '; // Orange Circle
 			}
 		}
 		for(row in tabledata[n].remote_nodes) {
 			var rowdata = tabledata[n].remote_nodes[row];
 			if(rowdata.info === 'NO CONNECTION') {
-				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
+				tablehtml += '<tr><td colspan="9">No Connections</td></tr>';
 				if(lnodes.length) {
 					lnodes = [];
 					updateFavsTableNodeCol();
@@ -358,6 +358,7 @@ function handleNodesEvent(event) {
 						updateFavsTableNodeCol();
 					}
 				} else {
+					nodeDir = rowdata.direction;
 					total_nodes++
 					// Set background color
 					if(rowdata.keyed == 'yes') {
@@ -377,7 +378,7 @@ function handleNodesEvent(event) {
 						tablehtml += '<td>' + rowdata.ip + '</td>';
 					}
 					tablehtml += '<td id="lkey' + row + '">' + rowdata.last_keyed + '</td>';
-					tablehtml += '<td>' + rowdata.direction + '</td>';
+					tablehtml += '<td>' + nodeDir + '</td>';
 					tablehtml += '<td id="elap' + row +'">' +
 						rowdata.elapsed + '</td>';
 					// Show mode
@@ -390,6 +391,35 @@ function handleNodesEvent(event) {
 					} else {
 						tablehtml += '<td>' + rowdata.mode + '</td>';
 					}
+					var id = 't' + n + 'c7' + 'r' + row;
+					if(rowdata.modifyok == 1) {
+						if(rowdata.mute == 1) {
+							tablehtml += '<td value="unmute" id="unmute" class="nodeClick" onClick="muteNode(\'unmute\',\'' + nodeNum + '\',\'' + nodeDir + '\')" title="Click to unmute node ' + nodeNum + '"><img src="images/mic-mute-16x16.png" alt="Unmute" /></td>';
+						} else if(rowdata.mute==0) {
+							tablehtml += '<td value="mute" id="mute" class="nodeClick" onClick="muteNode(\'mute\',\'' + nodeNum + '\',\'' + nodeDir + '\')" title="Click to mute node ' + nodeNum + '"><img src="images/mic-16x16.png" alt="Mute" /></td>';
+						}
+					} else {
+						if(rowdata.mute == 1) {
+							tablehtml += '<td value="unmute" id="unmute"><img src="images/mic-mute-16x16.png" alt="Muted" /></td>';
+						} else if(rowdata.mute==0) {
+							tablehtml += '<td value="mute" id="mute"><img src="images/mic-16x16.png" alt="Mute" /></td>';
+						}
+					}
+					var id = 't' + n + 'c8' + 'r' + row;
+					if(rowdata.modifyok == 1) {
+						if(rowdata.monitor == 1) {
+							tablehtml += '<td value="unmonitor" id="unmonitor" class="nodeClick" onClick="muteNode(\'unmonitor\',\'' + nodeNum + '\',\'' + nodeDir + '\')" title="Click to unmonitor node ' + nodeNum + '"><img src="images/speaker-mute-16x16.png" alt="Unmonitor" /></td>';
+						} else if(rowdata.monitor==0) {
+							tablehtml += '<td value="monitor" id="monitor" class="nodeClick" onClick="muteNode(\'monitor\',\'' + nodeNum + '\',\'' + nodeDir + '\')" title="Click to monitor node ' + nodeNum + '"><img src="images/speaker-16x16.png" alt="Monitor" /></td>';
+						}
+					} else {
+						if(rowdata.monitor == 1) {
+							tablehtml += '<td value="unmonitor" id="unmonitor"><img src="images/speaker-mute-16x16.png" alt="Monitoring" /></td>';
+						} else if(rowdata.monitor==0) {
+							tablehtml += '<td value="monitor" id="monitor"><img src="images/speaker-16x16.png" alt="Monitor" /></td>';
+						}
+					}
+
 					tablehtml += '</tr>';
 				}
 			}
@@ -483,6 +513,10 @@ function handleApiResponse() {
 	}
 }
 
+function muteNode(button,remoteNode,nodeDir) {
+	parms = 'remotenode=' + remoteNode + '&button=' + button + '&localnode=' + localNode + '&conndir=' + nodeDir;
+	xhttpSend(astApiDir + 'mute.php', parms);
+}
 function connectNode(button) {
 	var remoteNode = rnode.value;
 	if(remoteNode < 1) {
