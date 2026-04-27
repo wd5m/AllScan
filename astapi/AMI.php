@@ -104,4 +104,184 @@ function getResponse($fp, $actionID, $debug=false) {
 	return 'Timeout';
 }
 
+	// ── MuteAudio functions  ────────────────────────────────────────────────────
+	// These functions are used in server.php and mute.php for muteaudio feature.
+	function checkMuteaudioStatus($fp, string $state, string $thisnode, $node): bool {
+		// returns true (1) if a database key is found,
+		// returns false (0) if no database key is found.
+		static $errCnt=0;
+		$actionRand = mt_rand();
+		$actionID = 'checMuteaudioStatus' . $actionRand;
+		$Request = "Action: Command\r\n";
+		$Request .= "Command: database showkey $state/$thisnode/$node\r\n";
+		$Request .= "ActionID: $actionID\r\n";
+		$Request .= "\r\n";
+		if (@fwrite($fp, $Request) > 0) {
+			$response = $this->getResponse($fp, $actionID);
+			foreach($response as $line) {
+				if (preg_match("/ 0 results found./", $line) == 1) {
+					return 0;
+				}
+			}
+		}else{
+			sendData(['status'=>'checkMutestatus function failed!']);
+			// On ASL3 if Asterisk restarts above error repeats indefinitely. Let client JS reinit connection.
+			if(++$errCnt > 9)
+				exit();
+			return 0;
+		}
+		return 1;
+	}
+
+	function checkModuleSupport($fp, string $module='res_mutestream'): bool {
+		// returns true (1) if the module (res_mutestream) module is available.
+		// returns false (0) if the module is not available.
+		static $errCnt=0;
+		$actionRand = mt_rand();
+		$actionID = 'modulecheck' . $actionRand;
+		$Request = "Action: ModuleCheck\r\n";
+		$Request .= "Module: $module\r\n";
+		$Request .= "ActionID: $actionID\r\n";
+		$Request .= "\r\n";
+		if (@fwrite($fp, $Request) > 0) {
+			$response = $this->getResponse($fp, $actionID);
+			foreach($response as $line) {
+				if (preg_match("/Response: Success/", $line) == 1) {
+					return 1;
+				}
+			}
+		}else{
+			sendData(['status'=>'moduleCheck function failed!']);
+			// On ASL3 if Asterisk restarts above error repeats indefinitely. Let client JS reinit connection.
+			if(++$errCnt > 9)
+				exit();
+			return 0;
+		}
+		return 0;
+	}
+	// ── High-Level Actions ────────────────────────────────────────────────────
+	/**
+	* Issue a CoreShowChannels action and collect all channel entries.
+	*
+	* CoreShowChannels responds with:
+	*   • Zero or more  Event: CoreShowChannel  blocks (one per channel)
+	*   • A final       Event: CoreShowChannelsComplete  block
+	*
+	* @return list<array<string, string>>
+	*/
+	function getCoreShowChannels($fp): array {
+		$this->sendAction($fp, [
+			'Action'   => 'CoreShowChannels',
+			'ActionID' => 'channels_' . uniqid(),
+		]);
+		$channels = [];
+		while (true) {
+			$block = $this->readResponse($fp);
+			if (empty($block)) {
+			// Socket timed out or closed unexpectedly
+				break;
+			}
+			$event = $block['Event'] ?? '';
+			if ($event === 'CoreShowChannel') {
+				$channels[] = $block;
+			} elseif ($event === 'CoreShowChannelsComplete') {
+				break;   // All channel blocks have been received
+			}
+			// Ignore unrelated events (e.g. queued events from Asterisk)
+		}
+		return $channels;
+	}
+
+	/**
+	* Issue a GetVar action to retrieve a single channel variable.
+	*
+	* Works for both plain variables (e.g. MYVAR) and CDR fields
+	* expressed as CDR(src), CDR(dst), etc.
+	*
+	* Returns the variable's value, or an empty string if not set.
+	*/
+	function getChannelVar($fp, string $channel, string $variable): string {
+		$actionId = 'getvar_' . uniqid();
+		$this->sendAction($fp, [
+			'Action'   => 'GetVar',
+			'Channel'  => $channel,
+			'Variable' => $variable,
+			'ActionID' => $actionId,
+		]);
+		// Response is a single block:
+		//   Response: Success
+		//   ActionID: ...
+		//   Variable: CDR(src)
+		//   Value: 5551234567
+		$block = $this->readResponse($fp);
+		if (($block['Response'] ?? '') === 'Success') {
+			return $block['Value'] ?? '';
+		}
+		return '';
+	}
+
+	/**
+	* Mute or unmute a channel using the MuteAudio AMI action.
+	* Direction: 'in', 'out', or 'all'
+	* State: 'on' or 'off'
+	*/
+	function setMuteAudio($fp, string $channel, string $direction, string $state): bool {
+		$actionId = 'setmute_' . uniqid();
+		$this->sendAction($fp, [
+			'Action'    => 'MuteAudio',
+			'Channel'   => $channel,
+			'Direction' => $direction,
+			'State'     => $state,
+			'ActionID'  => $actionId,
+		]);
+		// Response is a single block:
+		//   Response: Success
+		//   ActionID: ...
+		$block = $this->readResponse($fp);
+		if (($block['Response'] ?? '') === 'Success') {
+			return $block['Value'] ?? 1;
+		}
+		return 0;
+	}
+	
+	// ── Core I/O ──────────────────────────────────────────────────────────────
+	
+	/**
+	* Write a key→value action block to the socket.
+	*
+	* @param array<string, string> $fields
+	*/
+	function sendAction($fp, array $fields): void {
+		$packet = '';
+		foreach ($fields as $key => $value) {
+			$packet .= "{$key}: {$value}\r\n";
+		}
+		$packet .= "\r\n";   // blank line terminates the action
+		@fwrite($fp, $packet);
+	}
+	
+	/**
+	* Read lines from the socket until a blank line is encountered.
+	* Returns an associative array of the key: value pairs received.
+	*
+	* @return array<string, string>
+	*/
+	function readResponse($fp): array {
+		$data = [];
+		while (($line = fgets($fp)) !== false) {
+			$line = rtrim($line, "\r\n");
+			if ($line === '') {
+				break;   // blank line = end of this response block
+			}
+			// Split on the FIRST colon only so values may contain colons
+			$pos = strpos($line, ':');
+			if ($pos !== false) {
+				$key         = trim(substr($line, 0, $pos));
+				$value       = trim(substr($line, $pos + 1));
+				$data[$key]  = $value;
+			}
+		}
+		return $data;
+	}
+
 }

@@ -75,6 +75,8 @@ if(_count($msg))
 	$s .= BR . implode(BR, $msg);
 statMsg($s);
 
+$mutesupport = $ami->checkModuleSupport($fp[$node],'res_mutestream');
+
 // Main loop - build $data array and output as a json object
 $current = [];
 $saved = [];
@@ -111,6 +113,11 @@ while(!empty($fp[$node])) {
 		$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
+		if($mutesupport) {
+			$current[$node]['remote_nodes'][$i]['modifyok'] = modifyOk() ?? '0';;
+			$current[$node]['remote_nodes'][$i]['mute'] = $ami->checkMuteaudioStatus($fp[$node],'mute',$node,$arr['node']) ?? '0';
+			$current[$node]['remote_nodes'][$i]['monitor'] = $ami->checkMuteaudioStatus($fp[$node],'monitor',$node,$arr['node']) ?? '0';
+		}
 		$i++;
 	}
 	// Send current nodes only when data changes
