@@ -11,11 +11,11 @@ function showConnStatusTable() {
 <div class="twrap">
 <table class="grid" id="table_' . $node .'">
 <thead>
-<tr><th colspan="6"><i>' . $title2 . '</i></th></tr>
-<tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Dir</th><th>Connected</th><th>Mode</th></tr>
+<tr><th colspan="9"><i>' . $title2 . '</i></th></tr>
+<tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Dir</th><th>Connected</th><th>Mode</th><th></th><th></th></tr>
 </thead>
 <tbody>
-<tr><td colspan="6">Waiting...</td></tr>
+<tr><td colspan="9">Waiting...</td></tr>
 </tbody>
 </table>
 </div><br>
