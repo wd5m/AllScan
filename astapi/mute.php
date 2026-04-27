@@ -125,7 +125,7 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 								$dbCmd = 'database del ' . 'monitor/' . $thisNode . ' ' . $targetNode;
 								$resp = $ami->command($fp, $dbCmd);
 							}
-							echo "MUTEAUDIO $thisNode $targetNode $channelName all $state succeeded!";
+							echo "MUTEAUDIO $thisNode $targetNode $channelName all " . ($state === 1 ? "on" : "off") . " succeeded!";
 							return(TRUE);
 						}
 					} else {
@@ -137,7 +137,7 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 								$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
 								$resp = $ami->command($fp, $dbCmd);
 							}
-							echo "MUTEAUDIO $thisNode $targetNode $channelName $direction $state succeeded!";
+							echo "MUTEAUDIO $thisNode $targetNode $channelName $direction " . ($state === 1 ? "on" : "off") . " succeeded!";
 							return(TRUE);
 						}
 					}
@@ -153,7 +153,7 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 							$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
 							$resp = $ami->command($fp, $dbCmd);
 						}
-						echo "MUTEAUDIO $thisNode $targetNode $channelName $direction $state succeeded!";
+						echo "MUTEAUDIO $thisNode $targetNode $channelName $direction " . ($state === 1 ? "on" : "off") . " succeeded!";
 						return(TRUE);
 					}
 				}
