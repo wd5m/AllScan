@@ -115,14 +115,11 @@ while(!empty($fp[$node])) {
 		$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
 		$current[$node]['remote_nodes'][$i]['num_links'] = $arr['num_links'] ?? '';
 		$current[$node]['remote_nodes'][$i]['num_alinks'] = $arr['num_alinks'] ?? '';
-<<<<<<< HEAD
 		if($mutesupport) {
 			$current[$node]['remote_nodes'][$i]['modifyok'] = modifyOk() ?? '0';;
 			$current[$node]['remote_nodes'][$i]['mute'] = $ami->checkMuteaudioStatus($fp[$node],'mute',$node,$arr['node']) ?? '0';
 			$current[$node]['remote_nodes'][$i]['monitor'] = $ami->checkMuteaudioStatus($fp[$node],'monitor',$node,$arr['node']) ?? '0';
 		}
-=======
->>>>>>> main
 		$i++;
 	}
 	// Send current nodes only when data changes
