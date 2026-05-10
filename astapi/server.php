@@ -113,6 +113,8 @@ while(!empty($fp[$node])) {
 		$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
 		$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
+		$current[$node]['remote_nodes'][$i]['num_links'] = $arr['num_links'] ?? '';
+		$current[$node]['remote_nodes'][$i]['num_alinks'] = $arr['num_alinks'] ?? '';
 		if($mutesupport) {
 			$current[$node]['remote_nodes'][$i]['modifyok'] = modifyOk() ?? '0';;
 			$current[$node]['remote_nodes'][$i]['mute'] = $ami->checkMuteaudioStatus($fp[$node],'mute',$node,$arr['node']) ?? '0';
@@ -273,6 +275,12 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 		if(preg_match('/Var: RPT_TXKEYED=(.)/', $line, $matches)) {
 			$txKeyed = $matches[1];
 		}
+		if(preg_match('/Var: RPT_NUMLINKS=(.*)/', $line, $matches)) {
+			$numLinks = $matches[1];
+		}
+		if(preg_match('/Var: RPT_NUMALINKS=(.*)/', $line, $matches)) {
+			$numALinks = $matches[1];
+		}
 		if(preg_match("/LinkedNodes: (.*)/", $line, $matches)) {
 			$longRangeLinks = preg_split("/, /", trim($matches[1]));
 			foreach($longRangeLinks as $line) {
@@ -325,6 +333,8 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 	}
 	$curNodes[1]['cos_keyed'] = ($rxKeyed === "1") ? 1 : 0;
 	$curNodes[1]['tx_keyed'] = ($txKeyed === "1") ? 1 : 0;
+	$curNodes[1]['num_links'] = $numLinks;
+	$curNodes[1]['num_alinks'] = $numALinks;
 	// Add list of all connected nodes
 	$curNodes[1]['lnodes'] = $lnodes;
 	return $curNodes;
