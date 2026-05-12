@@ -303,6 +303,16 @@ background-color:hsl(120,50%,33%);
 .ib { display:inline-block; }
 .m5 { margin:5px; }
 .nodeNum { cursor:pointer; }
+table.grid img {
+vertical-align:middle;
+width:16px;
+height:auto;
+}
+.nodeClick {
+cursor:pointer;
+background-color:#444;
+}
+.nodeClick:hover { background-color:#777; }
 .w600 { max-width:600px; }
 
 .button1 {
