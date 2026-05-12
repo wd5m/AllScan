@@ -105,7 +105,7 @@ function getResponse($fp, $actionID, $debug=false) {
 }
 
 	// ── MuteAudio functions  ────────────────────────────────────────────────────
-	// These functions are used in server.php and mute.php for muteaudio feature.
+	// These functions are used in server.php for muteaudio feature.
 	function checkMuteaudioStatus($fp, string $state, string $thisnode, $node): bool {
 		// returns true (1) if a database key is found,
 		// returns false (0) if no database key is found.
