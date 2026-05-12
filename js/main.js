@@ -433,7 +433,7 @@ function handleNodesEvent(event) {
 		// num_Links is the count of nodes connected in any mode other than Local monitor
 		// num_Alinks is the total count of direct or adjacent connected nodes
 		if(total_nodes > 1) {
-			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected (' + num_ALinks +
+			tablehtml += '<tr><td colspan="8">' + total_nodes + ' nodes connected (' + num_ALinks +
 				' direct, ' + num_Links + ' adjacent)</td></tr>';
 		}
 		// $('#table_' + n + ' tbody:first').html(tablehtml);
