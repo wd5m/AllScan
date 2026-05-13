@@ -102,22 +102,18 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 	} else {
 		foreach ($channels as $ch) {
 			if (strcasecmp($ch['Application'], 'rpt') !== 0) continue;
-			$channelName	= $ch['Channel'];
-			$callerIdNum	= $ch['CallerIDNum'];
-			$connectedLine	= $ch['ConnectedLineNum'];
-			$extension	= $ch['Exten'];
-			$channelType	= $ami->getChannelVar($fp, $channelName, 'CHANNEL(channeltype)');
+			$channelType	= $ami->getChannelVar($fp, $ch['Channel'], 'CHANNEL(channeltype)');
 			if ($conndir === 'OUT') {
 				// outgoing connections
-				if ($connectedLine === $thisNode && $extension === $targetNode) {
+				if ($ch['ConnectedLineNum'] === $thisNode && $ch['Exten'] === $targetNode) {
 					if ($channelType === 'echolink' || $channelType === 'tlb') {
 						// Allstar has an issue with Asterisk MuteAudio on tlb and EchoLink connections.
 						// Until resolved, this will set MuteAudio to 'all' so both directions are muted, and set both DB status indicators.
-						if ($ami->setMuteAudio($fp, $channelName, 'all', $state)) {
+						if ($ami->setMuteAudio($fp, $ch['Channel'], 'all', $state)) {
 							if ($state) {
-								$dbCmd = 'database put ' . 'mute/' . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$dbCmd = 'database put ' . 'mute/' . $thisNode . ' ' . $targetNode . ' "' . $ch['Channel'] . '"';
 								$resp = $ami->command($fp, $dbCmd);
-								$dbCmd = 'database put ' . 'monitor/' . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$dbCmd = 'database put ' . 'monitor/' . $thisNode . ' ' . $targetNode . ' "' . $ch['Channel'] . '"';
 								$resp = $ami->command($fp, $dbCmd);
 							} else {
 								$dbCmd = 'database del ' . 'mute/' . $thisNode . ' ' . $targetNode;
@@ -125,35 +121,35 @@ function mutemonitor($fp,$thisNode,$targetNode,$direction,$state,$conndir): bool
 								$dbCmd = 'database del ' . 'monitor/' . $thisNode . ' ' . $targetNode;
 								$resp = $ami->command($fp, $dbCmd);
 							}
-							echo "MUTEAUDIO $thisNode $targetNode $channelName all " . ($state === 1 ? "ON" : "OFF");
+							echo "MUTEAUDIO $thisNode $targetNode " . $ch['Channel'] . " all " . ($state === 1 ? "ON" : "OFF");
 							return(TRUE);
 						}
 					} else {
-						if ($ami->setMuteAudio($fp, $channelName, $direction, $state)) {
+						if ($ami->setMuteAudio($fp, $ch['Channel'], $direction, $state)) {
 							if ($state) {
-								$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+								$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $ch['Channel'] . '"';
 								$resp = $ami->command($fp, $dbCmd);
 							} else {
 								$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
 								$resp = $ami->command($fp, $dbCmd);
 							}
-							echo "MUTEAUDIO $thisNode $targetNode $channelName $direction " . ($state === 1 ? "ON" : "OFF");
+							echo "MUTEAUDIO $thisNode $targetNode " . $ch['Channel'] . " $direction " . ($state === 1 ? "ON" : "OFF");
 							return(TRUE);
 						}
 					}
 				}
 			} else {
 				// incoming connections
-				if ($extension === $thisNode && $callerIdNum === $targetNode) {
-					if ($ami->setMuteAudio($fp, $channelName, $direction, $state) === TRUE) {
+				if ($ch['Exten'] === $thisNode && ($ch['CallerIDNum'] === $targetNode || $ch['CallerIDName'] === $targetNode)) {
+					if ($ami->setMuteAudio($fp, $ch['Channel'], $direction, $state) === TRUE) {
 						if ($state) {
-							$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $channelName . '"';
+							$dbCmd = 'database put ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode . ' "' . $ch['Channel'] . '"';
 							$resp = $ami->command($fp, $dbCmd);
 						} else {
 							$dbCmd = 'database del ' . ($direction === "in" ? 'mute/' : 'monitor/') . $thisNode . ' ' . $targetNode;
 							$resp = $ami->command($fp, $dbCmd);
 						}
-						echo "MUTEAUDIO $thisNode $targetNode $channelName $direction " . ($state === 1 ? "ON" : "OFF");
+						echo "MUTEAUDIO $thisNode $targetNode " . $ch['Channel'] . " $direction " . ($state === 1 ? "ON" : "OFF");
 						return(TRUE);
 					}
 				}
